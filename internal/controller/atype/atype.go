@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package {{ .Env.KIND | strings.ToLower }}
+package atype
 
 import (
 	"context"
@@ -34,13 +34,13 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
-	"{{ .Env.PROJECT_REPO | strings.ToLower }}/apis/{{ .Env.GROUP | strings.ToLower }}/{{ .Env.APIVERSION | strings.ToLower }}"
-	apisv1alpha1 "{{ .Env.PROJECT_REPO | strings.ToLower }}/apis/v1alpha1"
-	"{{ .Env.PROJECT_REPO | strings.ToLower }}/internal/features"
+	"github.com/crossplane/provider-template/apis/sample/v1alpha1"
+	apisv1alpha1 "github.com/crossplane/provider-template/apis/v1alpha1"
+	"github.com/crossplane/provider-template/internal/features"
 )
 
 const (
-	errNot{{ .Env.KIND }}    = "managed resource is not a {{ .Env.KIND }} custom resource"
+	errNotAType    = "managed resource is not a AType custom resource"
 	errTrackPCUsage = "cannot track ProviderConfig usage"
 	errGetPC        = "cannot get ProviderConfig"
 	errGetCreds     = "cannot get credentials"
@@ -55,9 +55,9 @@ var (
 	newNoOpService = func(_ []byte) (interface{}, error) { return &NoOpService{}, nil }
 )
 
-// Setup adds a controller that reconciles {{ .Env.KIND }} managed resources.
+// Setup adds a controller that reconciles AType managed resources.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
-	name := managed.ControllerName(v1alpha1.{{ .Env.KIND }}GroupKind)
+	name := managed.ControllerName(v1alpha1.ATypeGroupKind)
 
 	cps := []managed.ConnectionPublisher{managed.NewAPISecretPublisher(mgr.GetClient(), mgr.GetScheme())}
 	if o.Features.Enabled(features.EnableAlphaExternalSecretStores) {
@@ -65,7 +65,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	}
 
 	r := managed.NewReconciler(mgr,
-		resource.ManagedKind(v1alpha1.{{ .Env.KIND }}GroupVersionKind),
+		resource.ManagedKind(v1alpha1.ATypeGroupVersionKind),
 		managed.WithExternalConnecter(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1.ProviderConfigUsage{}),
@@ -79,7 +79,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		Named(name).
 		WithOptions(o.ForControllerRuntime()).
 		WithEventFilter(resource.DesiredStateChanged()).
-		For(&v1alpha1.{{ .Env.KIND }}{}).
+		For(&v1alpha1.AType{}).
 		Complete(ratelimiter.NewReconciler(name, r, o.GlobalRateLimiter))
 }
 
@@ -97,9 +97,9 @@ type connector struct {
 // 3. Getting the credentials specified by the ProviderConfig.
 // 4. Using the credentials to form a client.
 func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.ExternalClient, error) {
-	cr, ok := mg.(*v1alpha1.{{ .Env.KIND }})
+	cr, ok := mg.(*v1alpha1.AType)
 	if !ok {
-		return nil, errors.New(errNot{{ .Env.KIND }})
+		return nil, errors.New(errNotAType)
 	}
 
 	if err := c.usage.Track(ctx, mg); err != nil {
@@ -135,9 +135,9 @@ type external struct {
 }
 
 func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
-	cr, ok := mg.(*v1alpha1.{{ .Env.KIND }})
+	cr, ok := mg.(*v1alpha1.AType)
 	if !ok {
-		return managed.ExternalObservation{}, errors.New(errNot{{ .Env.KIND }})
+		return managed.ExternalObservation{}, errors.New(errNotAType)
 	}
 
 	if meta.GetExternalName(cr) == "" {
@@ -169,9 +169,9 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 }
 
 func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
-	cr, ok := mg.(*v1alpha1.{{ .Env.KIND }})
+	cr, ok := mg.(*v1alpha1.AType)
 	if !ok {
-		return managed.ExternalCreation{}, errors.New(errNot{{ .Env.KIND }})
+		return managed.ExternalCreation{}, errors.New(errNotAType)
 	}
 
 	fmt.Printf("Creating: %+v", cr)
@@ -185,9 +185,9 @@ func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 }
 
 func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
-	cr, ok := mg.(*v1alpha1.{{ .Env.KIND }})
+	cr, ok := mg.(*v1alpha1.AType)
 	if !ok {
-		return managed.ExternalUpdate{}, errors.New(errNot{{ .Env.KIND }})
+		return managed.ExternalUpdate{}, errors.New(errNotAType)
 	}
 
 	fmt.Printf("Updating: %+v", cr)
@@ -200,9 +200,9 @@ func (c *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 }
 
 func (c *external) Delete(ctx context.Context, mg resource.Managed) (managed.ExternalDelete, error) {
-	cr, ok := mg.(*v1alpha1.{{ .Env.KIND }})
+	cr, ok := mg.(*v1alpha1.AType)
 	if !ok {
-		return managed.ExternalDelete{}, errors.New(errNot{{ .Env.KIND }})
+		return managed.ExternalDelete{}, errors.New(errNotAType)
 	}
 
 	fmt.Printf("Deleting: %+v", cr)
