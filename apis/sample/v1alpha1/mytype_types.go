@@ -27,13 +27,14 @@ import (
 
 // MyTypeParameters are the configurable fields of a MyType.
 type MyTypeParameters struct {
-	ConfigurableField string `json:"configurableField"`
+	ConfigurableField *string `json:"configurableField,omitempty"`
 }
 
 // MyTypeObservation are the observable fields of a MyType.
 type MyTypeObservation struct {
 	ConfigurableField string `json:"configurableField"`
 	ObservableField   string `json:"observableField,omitempty"`
+	Created           bool   `json:"created"`
 }
 
 // A MyTypeSpec defines the desired state of a MyType.

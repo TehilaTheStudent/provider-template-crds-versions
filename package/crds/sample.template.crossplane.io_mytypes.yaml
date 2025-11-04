@@ -75,8 +75,6 @@ spec:
                 properties:
                   configurableField:
                     type: string
-                required:
-                - configurableField
                 type: object
               managementPolicies:
                 default:
@@ -253,10 +251,13 @@ spec:
                 properties:
                   configurableField:
                     type: string
+                  created:
+                    type: boolean
                   observableField:
                     type: string
                 required:
                 - configurableField
+                - created
                 type: object
               conditions:
                 description: Conditions of the resource.
